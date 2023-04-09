@@ -17,6 +17,8 @@ app = Flask(__name__)
 login_manager = LoginManager()
 login_manager.init_app(app)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
+app.config['RECAPTCHA_PUBLIC_KEY'] = '6LdOeXIlAAAAAAg2kEZ9uockHFNLJurPcT82qeN_'
+app.config['RECAPTCHA_PRIVATE_KEY'] = '6LdOeXIlAAAAAPASxPhAQhq89k7yA7UIT1u5XRzy'
 
 @login_manager.user_loader
 def load_user(user_id):
