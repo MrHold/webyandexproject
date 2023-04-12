@@ -1,4 +1,4 @@
-from flask_wtf import FlaskForm
+from flask_wtf import FlaskForm, RecaptchaField
 from wtforms import PasswordField, StringField, TextAreaField, SubmitField, BooleanField
 from wtforms.fields import EmailField
 from wtforms.validators import DataRequired, Email, EqualTo, Length
@@ -10,6 +10,7 @@ class RegisterForm(FlaskForm):
     password = PasswordField('Пароль', validators=[DataRequired(), Length(min=8, message="Пароль должен быть больше 8 символов"), EqualTo('password_again', message='Пароли должны совпадать')])
     password_again = PasswordField('Повторите пароль', validators=[DataRequired()])
     username = StringField('Никнейм пользователя', validators=[DataRequired()])
+    recaptcha = RecaptchaField()
     submit = SubmitField('Зарегистрироваться')
 
 
@@ -17,4 +18,5 @@ class LoginForm(FlaskForm):
     email = EmailField('Почта', validators=[DataRequired()])
     password = PasswordField('Пароль', validators=[DataRequired()])
     remember_me = BooleanField('Запомнить меня')
+    recaptcha = RecaptchaField()
     submit = SubmitField('Войти')

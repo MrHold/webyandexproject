@@ -1,9 +1,10 @@
 from flask import Flask
-from flask import render_template, redirect, request, url_for, abort
+from flask import render_template, redirect, request, url_for, abort, Blueprint, session
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 import json
 from flask_wtf import FlaskForm
 from data.users import User
+from data.words import Word
 from data import db_session
 from forms.user import RegisterForm, LoginForm
 from wtforms import StringField, PasswordField, SubmitField
@@ -17,6 +18,9 @@ app = Flask(__name__)
 login_manager = LoginManager()
 login_manager.init_app(app)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
+app.config['RECAPTCHA_PUBLIC_KEY'] = '6LdOeXIlAAAAAAg2kEZ9uockHFNLJurPcT82qeN_'
+app.config['RECAPTCHA_PRIVATE_KEY'] = '6LdOeXIlAAAAAPASxPhAQhq89k7yA7UIT1u5XRzy'
+
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -28,6 +32,16 @@ def load_user(user_id):
 def logout():
     logout_user()
     return redirect("/")
+
+@app.route("/toggle-theme")
+def toggle_theme():
+    current_theme = session.get("theme")
+    if current_theme == "dark":
+        session["theme"] = "light"
+    else:
+        session["theme"] = "dark"
+
+    return redirect('/')
 
 morph = pymorphy3.MorphAnalyzer()
 answer = {
@@ -53,6 +67,7 @@ def main():
         return render_template("index.html", toget=False)
     elif request.method == "POST":
         word = request.form["search"]
+        word_not_correct = word
         if word:
             word_checked = check_word(word)
             if word_checked and type(word_checked).__name__ == 'list':
@@ -63,6 +78,15 @@ def main():
                 usr.words = usr.words + ', ' + word
             else:
                 usr.words = word
+        if word_not_correct != word:
+            wrd = db_sess.query(Word).filter(Word.correct == word).first()
+            if wrd:
+                wrd.not_correct = wrd.not_correct + ', ' + word_not_correct
+            elif not wrd:
+                x = Word()
+                x.correct = word
+                x.not_correct = word_not_correct
+                db_sess.add(x)
             db_sess.commit()
         answer["Слово"] = str(morph.parse(word)[0].word)
         answer["Начальная форма"] = morph.parse(word)[0].normal_form

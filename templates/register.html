@@ -40,6 +40,14 @@
             </p>
         {% endfor %}
     </p>
+    <p>
+        {{ form.recaptcha }}<br>
+        {% for error in form.recaptcha.errors %}
+            <div class="alert alert-danger" role="alert">
+                {{ error }}
+            </div>
+        {% endfor %}
+    </p>
     <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
     {{message}}
     <p>Уже зарегистрированы? <a href="/login">Вход</a></p>

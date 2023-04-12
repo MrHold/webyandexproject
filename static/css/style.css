@@ -1,3 +1,53 @@
+:root {
+    --text-dark: #000;
+    --text-light: #fbf2f2;
+    --text-muted: #595959;
+
+    --background-color: #fff;
+    --accent-colour: #f56565;
+    --accent-colour-2: #3bb54a;
+    --tag-colour: #e5e5e5;
+
+    --border: 1px solid #000;
+    --ico: invert(0%);
+}
+
+:root.dark-mode {
+    --text-dark: #fbf2f2;
+    --text-light: #000;
+    --text-muted: #595959;
+  
+    --background-color: #1c2023;
+    --accent-colour: #f56565;
+    --accent-colour-2: #3bb54a;
+    --tag-colour: var(--accent-colour-2);
+  
+    --border: 1px solid #fff;
+    --ico: invert(100%);
+  }
+
+body {
+    background-color: var(--background-color);
+    color: var(--text-dark);
+}
+
+a {
+    color: #5d91f0;
+    text-decoration: none;
+}
+
+a:visited {
+    color: #4f84e6;
+}
+
+a:hover {
+    color: rgb(124, 165, 241);
+}
+
+.nav__item {
+    filter: var(--ico)
+}
+
 .answer {
     margin: 10px;
 }
