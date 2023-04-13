@@ -20,7 +20,7 @@
                               <div class="container-fluid">
                                   <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                                     <li class="nav-item">
-                                      <a class="d-flex nav-link d-md-block" href="/">
+                                      <a class="home d-flex nav-link d-md-block" href="/">
                                         Главная
                                       </a>
                                     </li>
@@ -28,15 +28,15 @@
                                   <a href="/toggle-theme" class="nav__link">
                                     <span class="nav-item nav__item">
                                         {% if session.get('theme') == "dark" %}
-                                            <img src="https://img.icons8.com/ios/50/null/sun--v1.png" alt="sun" style="width: 60%; height: auto;">
+                                          <img src="https://img.icons8.com/material-rounded/24/null/sun--v1.png" alt="sun" style="margin-right: 16px; width: 25px; height: auto;">
                                         {% else %}
-                                            <img src="https://img.icons8.com/ios/50/null/crescent-moon.png" alt="moon" style="width: 60%; height: auto;">
+                                          <img src="https://img.icons8.com/external-smashingstocks-glyph-smashing-stocks/66/null/external-moon-web-smashingstocks-glyph-smashing-stocks.png" alt="moon" style="margin-right: 16px; width: 25px; height: auto;">
                                         {% endif %}
                                     </span>
                                   </a>
                                   <a class="nav-link d-none d-md-block" href="/about">О проекте</a>
                                   {% if current_user.is_authenticated %}
-                                  <a class="nav-link d-none d-md-block" href="/user">{{ current_user.username }}</a>
+                                  <a class="nav-link d-none d-md-block" href="/user/{{ current_user.id }}">{{ current_user.username }}</a>
                                   {% else %}
                                   <a class="nav-link d-none d-md-block" href="/login">Войти</a>
                                   {% endif %}

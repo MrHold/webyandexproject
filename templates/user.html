@@ -8,7 +8,7 @@
                             integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1"
                             crossorigin="anonymous">
                             <meta http-equiv="X-UA-Compatible" content="IE=edge">
-                            <link rel="stylesheet" type="text/css" href="static/css/style.css" />
+                            <link rel="stylesheet" type="text/css" href="../static/css/style.css" />
                             <title>{{ title }}</title>
                           </head>
                           <body>
@@ -20,7 +20,7 @@
                               <div class="container-fluid">
                                   <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                                     <li class="nav-item">
-                                      <a class="d-flex nav-link d-md-block" href="/">
+                                      <a class="home d-flex nav-link d-md-block" href="/">
                                         Главная
                                       </a>
                                     </li>
@@ -28,9 +28,9 @@
                                   <a href="/toggle-theme" class="nav__link">
                                     <span class="nav-item nav__item">
                                         {% if session.get('theme') == "dark" %}
-                                            <img src="https://img.icons8.com/ios/50/null/sun--v1.png" alt="sun" style="width: 60%; height: auto;">
+                                          <img src="https://img.icons8.com/material-rounded/24/null/sun--v1.png" alt="sun" style="margin-right: 16px; width: 25px; height: auto;">
                                         {% else %}
-                                            <img src="https://img.icons8.com/ios/50/null/crescent-moon.png" alt="moon" style="width: 60%; height: auto;">
+                                          <img src="https://img.icons8.com/external-smashingstocks-glyph-smashing-stocks/66/null/external-moon-web-smashingstocks-glyph-smashing-stocks.png" alt="moon" style="margin-right: 16px; width: 25px; height: auto;">
                                         {% endif %}
                                     </span>
                                   </a>
@@ -44,13 +44,13 @@
                             </nav>
                             <main role="main" class="container">
                               <h2>Слова, которые вы искали:</h2>
-                              {% if current_user.words %}
-                                {% for i in words %}
-                                  <p>{{ i }}</p>
-                                {% endfor %}
-                              {% else %}
-                              <p>К сожалению мы не смогли найти слов, которые вы искали. Попробуйте поискать какое-либо слово. Если оно не появится тут, напишите нам.</p>
-                              {% endif %}
+                                {% if current_user.words %}
+                                  {% for i in words %}
+                                    <p>{{ i }}</p>
+                                  {% endfor %}
+                                {% else %}
+                                <p>К сожалению мы не смогли найти слов, которые вы искали. Попробуйте поискать какое-либо слово. Если оно не появится тут, напишите нам.</p>
+                                {% endif %}
                             </main>
                           </body>
                         </html>

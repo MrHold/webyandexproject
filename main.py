@@ -20,6 +20,7 @@ login_manager.init_app(app)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 app.config['RECAPTCHA_PUBLIC_KEY'] = '6LdOeXIlAAAAAAg2kEZ9uockHFNLJurPcT82qeN_'
 app.config['RECAPTCHA_PRIVATE_KEY'] = '6LdOeXIlAAAAAPASxPhAQhq89k7yA7UIT1u5XRzy'
+##app.config['TESTING'] = True
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -39,8 +40,10 @@ def toggle_theme():
         session["theme"] = "light"
     else:
         session["theme"] = "dark"
-
-    return redirect('/')
+    if 'url' in session:
+        return redirect(session['url'])
+    else:
+        return redirect('/')
 
 morph = pymorphy3.MorphAnalyzer()
 answer = {
@@ -60,7 +63,9 @@ def check_word(word):
         print('Ошибка выполнения запроса')
 
 @app.route('/', methods=['POST', 'GET'])
+@app.route('/index', methods=['POST', 'GET'])
 def main():
+    session['url'] = '/'
     db_sess = db_session.create_session()
     if request.method == "GET":
         return render_template("index.html", toget=False)
@@ -94,15 +99,17 @@ def main():
 
         return render_template("index.html", toget=True, answer=answer)
 
-@app.route('/user')
+@app.route('/user/<int:id>')
 @login_required
-def user_page():
+def user_page(id):
+    session['url'] = f'/user/{id}'
     db_sess = db_session.create_session()
     return render_template("user.html", title=f'Профиль {current_user.username}', words=list(set(current_user.words.split(', '))))
     
 
 @app.route('/register', methods=['GET', 'POST'])
 def reqister():
+    session['url'] = '/register'
     form = RegisterForm()
     if form.validate_on_submit():
         if form.password.data != form.password_again.data:
@@ -124,6 +131,7 @@ def reqister():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    session['url'] = '/login'
     form = LoginForm()
     if form.validate_on_submit():
         db_sess = db_session.create_session()
@@ -136,6 +144,7 @@ def login():
 
 @app.route('/about')
 def about():
+    session['url'] = '/about'
     return render_template('about.html', title="О проекте")
 
 if __name__ == '__main__':

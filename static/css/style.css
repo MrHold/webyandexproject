@@ -31,17 +31,21 @@ body {
     color: var(--text-dark);
 }
 
+main>h1, main>h2 {
+    margin-top: 15px;
+}
+
 a {
-    color: #5d91f0;
+    color: var(--text-dark);
     text-decoration: none;
 }
 
 a:visited {
-    color: #4f84e6;
+    color: var(--text-dark);
 }
 
 a:hover {
-    color: rgb(124, 165, 241);
+    color: rgb(59, 119, 231);
 }
 
 .nav__item {
@@ -50,4 +54,12 @@ a:hover {
 
 .answer {
     margin: 10px;
+}
+
+a.home {
+    color: var(--text-dark) !important;
+}
+
+a.home:hover {
+    color: rgb(59, 119, 231) !important;
 }
