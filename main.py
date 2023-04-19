@@ -21,7 +21,7 @@ login_manager.init_app(app)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 app.config['RECAPTCHA_PUBLIC_KEY'] = '6LdOeXIlAAAAAAg2kEZ9uockHFNLJurPcT82qeN_'
 app.config['RECAPTCHA_PRIVATE_KEY'] = '6LdOeXIlAAAAAPASxPhAQhq89k7yA7UIT1u5XRzy'
-##app.config['TESTING'] = True
+##app.config['TESTING'] = True если понадобится выключить проверку капчи
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -41,12 +41,14 @@ def toggle_theme():
         session["theme"] = "light"
     else:
         session["theme"] = "dark"
+    # возврат на предыдущую страницу при смене темы (т.к. смена темы - как бы отдельная ссылка)
     if 'url' in session:
         return redirect(session['url'])
     else:
         return redirect('/')
 
 morph = pymorphy3.MorphAnalyzer()
+# шаблон для ответа
 answer = {
     "Слово": "",
     "Начальная форма": "",
@@ -66,6 +68,7 @@ def check_word(word):
 @app.route('/', methods=['POST', 'GET'])
 @app.route('/index', methods=['POST', 'GET'])
 def main():
+    # установка необходимых для игры переменных сессии и переменной с текущей страницей
     session['game_ids'] = []
     session['gamek'] = 0
     session['url'] = '/'
@@ -80,12 +83,14 @@ def main():
             if word_checked and type(word_checked).__name__ == 'list':
                 word = word_checked[0]
         if current_user.is_authenticated:
+            # добавление слова в список слов, которые искал пользователь
             usr = db_sess.query(User).filter(User.id == current_user.id).first()
             if usr.words:
                 usr.words = usr.words + ', ' + word
             else:
                 usr.words = word
         if word_not_correct != word:
+            # добавление слова в список для игры
             wrd = db_sess.query(Word).filter(Word.correct == word).first()
             if wrd:
                 if word_not_correct not in wrd.not_correct:
@@ -123,15 +128,13 @@ def game():
         words = db_sess.query(Word).all()
         wrds = []
         for i in range(len(words)):
+            # шаблон для вывода слова
             d = {'id': 0, 'correct': '', 'not_correct': ''}
             d['id'] = words[i].id
             d['correct'] = words[i].correct
-            if ',' in words[i].not_correct:
-                d['not_correct'] = words[i].not_correct
-            else:
-                d['not_correct'] = words[i].not_correct
+            d['not_correct'] = words[i].not_correct
             wrds.append(d)
-        print(k)
+        # если игра пройдена (кончились слова)
         if k >= len(wrds):
             session['gamek'] = 0
             session['game_ids'] = []
@@ -145,8 +148,10 @@ def game():
         db_sess = db_session.create_session()
         words = db_sess.query(Word).all()
         wrds = []
+        # x - переменная со списком айди решённых слов
         x = session['game_ids']
         for i in range(len(words)):
+            # шаблон для вывода слова
             d = {'id': 0, 'correct': '', 'not_correct': ''}
             d['id'] = words[i].id
             d['correct'] = words[i].correct
@@ -158,6 +163,7 @@ def game():
                 if word and word == words[j].correct:
                     x.append(i)
             wrds.append(d)
+        # предупреждения \/
         if word == words[k].correct:
             k +=1
             session['gamek'] += 1
@@ -165,6 +171,7 @@ def game():
         else:
             err = 'Неправильно. Попробуйте снова.'
         session['game_ids'] = x
+        # если игра пройдена (кончились слова)
         if k >= len(wrds):
             session['gamek'] = 0
             session['game_ids'] = []
