@@ -1,5 +1,5 @@
 from flask import Flask
-from flask import render_template, redirect, request, url_for, abort, Blueprint, session
+from flask import render_template, redirect, request, url_for, abort, Blueprint, session, flash
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 import json
 from flask_wtf import FlaskForm
@@ -7,6 +7,7 @@ from data.users import User
 from data.words import Word
 from data import db_session
 from forms.user import RegisterForm, LoginForm
+from forms.word import WordGame
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired
 import os
@@ -65,12 +66,14 @@ def check_word(word):
 @app.route('/', methods=['POST', 'GET'])
 @app.route('/index', methods=['POST', 'GET'])
 def main():
+    session['game_ids'] = []
+    session['gamek'] = 0
     session['url'] = '/'
     db_sess = db_session.create_session()
     if request.method == "GET":
         return render_template("index.html", toget=False)
     elif request.method == "POST":
-        word = request.form["search"]
+        word = request.form["search"].lower()
         word_not_correct = word
         if word:
             word_checked = check_word(word)
@@ -85,11 +88,12 @@ def main():
         if word_not_correct != word:
             wrd = db_sess.query(Word).filter(Word.correct == word).first()
             if wrd:
-                wrd.not_correct = wrd.not_correct + ', ' + word_not_correct
+                if word_not_correct not in wrd.not_correct:
+                    wrd.not_correct = wrd.not_correct + ', ' + word_not_correct.lower()
             elif not wrd:
                 x = Word()
-                x.correct = word
-                x.not_correct = word_not_correct
+                x.correct = word.lower()
+                x.not_correct = word_not_correct.lower()
                 db_sess.add(x)
             db_sess.commit()
         answer["Слово"] = str(morph.parse(word)[0].word)
@@ -103,12 +107,75 @@ def main():
 @login_required
 def user_page(id):
     session['url'] = f'/user/{id}'
+    session['game_ids'] = []
     db_sess = db_session.create_session()
     return render_template("user.html", title=f'Профиль {current_user.username}', words=list(set(current_user.words.split(', '))))
-    
+
+@app.route('/game', methods=['POST', 'GET'])
+@login_required
+def game():
+    err = ''
+    form = WordGame()
+    if request.method == "GET":
+        session['url'] = f'/game'
+        k = int(session['gamek'])
+        db_sess = db_session.create_session()
+        words = db_sess.query(Word).all()
+        wrds = []
+        for i in range(len(words)):
+            d = {'id': 0, 'correct': '', 'not_correct': ''}
+            d['id'] = words[i].id
+            d['correct'] = words[i].correct
+            if ',' in words[i].not_correct:
+                d['not_correct'] = words[i].not_correct
+            else:
+                d['not_correct'] = words[i].not_correct
+            wrds.append(d)
+        print(k)
+        if k >= len(wrds):
+            session['gamek'] = 0
+            session['game_ids'] = []
+            return render_template("game.html", message=err, title='Игра по словам', form=form, wrds=None)
+        else:
+            return render_template("game.html", message=err, title='Игра по словам', form=form, wrds=wrds[k])
+    elif request.method == "POST":
+        word = request.form.get("word").lower()
+        session['url'] = f'/game'
+        k = int(session['gamek'])
+        db_sess = db_session.create_session()
+        words = db_sess.query(Word).all()
+        wrds = []
+        x = session['game_ids']
+        for i in range(len(words)):
+            d = {'id': 0, 'correct': '', 'not_correct': ''}
+            d['id'] = words[i].id
+            d['correct'] = words[i].correct
+            if ',' in words[i].not_correct:
+                d['not_correct'] = words[i].not_correct
+            else:
+                d['not_correct'] = words[i].not_correct
+            for j in range(1, k + 1):
+                if word and word == words[j].correct:
+                    x.append(i)
+            wrds.append(d)
+        if word == words[k].correct:
+            k +=1
+            session['gamek'] += 1
+            err = 'Правильно. Обновите страницу.'
+        else:
+            err = 'Неправильно. Попробуйте снова.'
+        session['game_ids'] = x
+        if k >= len(wrds):
+            session['gamek'] = 0
+            session['game_ids'] = []
+            return render_template("game.html", message=err, title='Игра по словам', form=form, wrds=None)
+        else:
+            return render_template("game.html", message=err, title='Игра по словам', form=form, wrds=wrds[k])
 
 @app.route('/register', methods=['GET', 'POST'])
 def reqister():
+    session['game_ids'] = []
+    session['gamek'] = 0
     session['url'] = '/register'
     form = RegisterForm()
     if form.validate_on_submit():
@@ -131,6 +198,8 @@ def reqister():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    session['game_ids'] = []
+    session['gamek'] = 0
     session['url'] = '/login'
     form = LoginForm()
     if form.validate_on_submit():
@@ -144,6 +213,8 @@ def login():
 
 @app.route('/about')
 def about():
+    session['game_ids'] = []
+    session['gamek'] = 0
     session['url'] = '/about'
     return render_template('about.html', title="О проекте")
 

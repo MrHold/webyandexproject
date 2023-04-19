@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2><a href="/user/{{ current_user.id }}">Посмотреть список слов, которые вы искали</a></h2>
+                              <h2>Игра по словам:</h2>
+                                {% if wrds %}
+                                  <form action="" method="post">
+                                    {{ form.hidden_tag() }}
+                                    <p>
+                                      {{ wrds.not_correct }}<br>
+                                      {{ form.word(class="form-control") }}<br>
+                                      {% for error in form.word.errors %}
+                                          <p class="alert alert-danger" role="alert">
+                                              {{ error }}
+                                          </p>
+                                      {% endfor %}
+                                    </p>
+                                    <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
+                                    {{message}}
+                                  </form>
+                                {% else %}
+                                <p>Поздравляем, кажется вы прошли игру!</p>
+                                {% endif %}
+{% endblock %}

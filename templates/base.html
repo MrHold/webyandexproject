@@ -43,6 +43,17 @@
                               </div>
                             </nav>
                             <main role="main" class="container">
+                              <div class="container-fluid" style="min-height:100%">
+                                {% with messages = get_flashed_messages() %} 
+                                  {% if messages %} 
+                                    {% for message in messages %}
+                                    <div class="alert alert-warning alert-dismissible" role="alert">
+                                      {{message}}
+                                    </div>
+                                    {% endfor %} 
+                                  {% endif %} 
+                                {% endwith %}
+                              </div>
                               {% block content %}{% endblock %}
                             </main>
                           </body>
