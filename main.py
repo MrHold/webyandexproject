@@ -114,7 +114,10 @@ def user_page(id):
     session['url'] = f'/user/{id}'
     session['game_ids'] = []
     db_sess = db_session.create_session()
-    return render_template("user.html", title=f'Профиль {current_user.username}', words=list(set(current_user.words.split(', '))))
+    if current_user.words:
+        return render_template("user.html", title=f'Профиль {current_user.username}', words=list(set(current_user.words.split(', '))))
+    else:
+        return render_template("user.html", title=f'Профиль {current_user.username}')
 
 @app.route('/game', methods=['POST', 'GET'])
 @login_required
